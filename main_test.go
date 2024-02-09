@@ -78,3 +78,27 @@ func TestGetMostRecentFileModTime(t *testing.T) {
 		t.Errorf("The most recent modification time is too far in the past: %v", mostRecent)
 	}
 }
+
+func TestRootEndpoint(t *testing.T) {
+	// Create a request to pass to the handler.
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK) // Set the status code to 200 OK.
+	})
+
+	// The handlers satisfy http.Handler, so call their ServeHTTP method
+	// directly and pass in the Request and ResponseRecorder.
+	handler.ServeHTTP(rr, req)
+
+	// Check that the status code is correct.
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+}

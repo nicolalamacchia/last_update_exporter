@@ -64,6 +64,9 @@ func getMostRecentFileModTime(folderPath string) (time.Time, error) {
 const port int = 9188
 
 func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 	slog.Info("Server starting", "port", port)
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/probe", probeHandler)
