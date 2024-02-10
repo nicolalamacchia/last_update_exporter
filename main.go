@@ -22,7 +22,7 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 
 	mostRecentUpdate, err := getMostRecentFileModTime(target)
 	if err != nil {
-		http.Error(w, "Error reading target folder: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error reading target directory: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -31,17 +31,17 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create a new registry to avoid metric collisions on concurrent probes.
 	reg := prometheus.NewRegistry()
-	folderUpdateMetric := prometheus.NewGaugeVec(
+	directoryUpdateMetric := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "folder_last_update_seconds",
-			Help: "Time in seconds since the last update of the probed folder.",
+			Name: "directory_last_update_seconds",
+			Help: "Time in seconds since the last update of the probed directory.",
 		},
-		[]string{"folder"},
+		[]string{"directory"},
 	)
-	reg.MustRegister(folderUpdateMetric)
+	reg.MustRegister(directoryUpdateMetric)
 
 	// Set and collect the metric.
-	folderUpdateMetric.WithLabelValues(target).Set(timePassed)
+	directoryUpdateMetric.WithLabelValues(target).Set(timePassed)
 	h := promhttp.HandlerFor(reg, promhttp.HandlerOpts{})
 	h.ServeHTTP(w, r)
 }
