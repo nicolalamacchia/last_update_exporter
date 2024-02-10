@@ -4,7 +4,6 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"time"
 
@@ -47,18 +46,13 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 	h.ServeHTTP(w, r)
 }
 
-func getMostRecentFileModTime(folderPath string) (time.Time, error) {
-	var mostRecent time.Time
-	err := filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && info.ModTime().After(mostRecent) {
-			mostRecent = info.ModTime()
-		}
-		return nil
-	})
-	return mostRecent, err
+func getMostRecentFileModTime(dirPath string) (time.Time, error) {
+	fileInfo, err := os.Stat(dirPath)
+	if err != nil {
+		return time.Time{}, err // return zero time and the error if any
+	}
+
+	return fileInfo.ModTime(), nil
 }
 
 const port int = 9188
